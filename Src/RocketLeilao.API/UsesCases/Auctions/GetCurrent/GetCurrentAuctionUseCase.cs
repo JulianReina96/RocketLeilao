@@ -1,19 +1,20 @@
-﻿using RocketLeilao.API.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using RocketLeilao.API.Entities;
+using RocketLeilao.API.Repositories;
 
 namespace RocketLeilao.API.UsesCases.Auctions.GetCurrent
 {
 	public class GetCurrentAuctionUseCase
 	{
-		public Auction Execute()
+		public Auction? Execute()
 		{
-			return new Auction
-			{
-				Id = 1,
-				Ends = DateTime.Now,
-				Starts = DateTime.Now,
-				Name = "Alo Romario"
+			var repository = new RocketLeilaoDbContext();
+			var date = DateTime.Now;
+			return repository
+				.Auctions
+				.Include(auction => auction.Items)				
+				.FirstOrDefault(auction => auction.Starts <= date && auction.Ends >= date);
 
-			};
 		}
 	}
 }
