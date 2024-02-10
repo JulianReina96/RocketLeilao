@@ -1,23 +1,25 @@
-﻿using RocketLeilao.API.Entities;
+﻿using RocketLeilao.API.Contracts;
+using RocketLeilao.API.Entities;
 using RocketLeilao.API.Repositories;
 using System.Text;
 
 namespace RocketLeilao.API.Services
 {
-    public class LoggerUser
+    public class LoggerUser : ILoggedUser
     {
         private readonly IHttpContextAccessor _httpContextAcessor;
-        public LoggerUser(IHttpContextAccessor httpContext) {
+        private readonly IUserRepository _repository;
+        public LoggerUser(IHttpContextAccessor httpContext, IUserRepository repository) {
         
             _httpContextAcessor = httpContext;
+            _repository = repository;
         }
         public User User()
         {
-            var repository = new RocketLeilaoDbContext();
             var token = TokenOnRequest();
             var email = FromBase64String(token);
             
-            return repository.Users.First(user =>  user.Email.Equals(email));
+            return _repository.GetUserByEmail(email);
 
         }
 

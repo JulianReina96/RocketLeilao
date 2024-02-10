@@ -1,6 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using RocketLeilao.API.Contracts;
 using RocketLeilao.API.Filtros;
+using RocketLeilao.API.Repositories;
+using RocketLeilao.API.Repositories.DataAccess;
 using RocketLeilao.API.Services;
+using RocketLeilao.API.UsesCases.Auctions.GetCurrent;
 using RocketLeilao.API.UsesCases.Offers.CreateOffer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,8 +48,19 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddScoped<AuthenticationUserAttribute>();
-builder.Services.AddScoped<LoggerUser>();
+builder.Services.AddScoped<ILoggedUser, LoggerUser>();
 builder.Services.AddScoped<CreateOfferUseCase>();
+builder.Services.AddScoped<GetCurrentAuctionUseCase>();
+builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
+builder.Services.AddScoped<IOfferRepository, OfferRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+
+
+builder.Services.AddDbContext<RocketLeilaoDbContext>(options =>
+{
+    options.UseSqlite(@"Data Source=C:\Users\julia\source\repos\RocketLeilao\DbSqlLite\leilaoDbNLW.db");
+}); 
 
 builder.Services.AddHttpContextAccessor();
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using RocketLeilao.API.Contracts;
 using RocketLeilao.API.Repositories;
 using System.Text;
 
@@ -9,15 +10,15 @@ namespace RocketLeilao.API.Filtros
 {
     public class AuthenticationUserAttribute : AuthorizeAttribute , IAuthorizationFilter
     {
-
+        private readonly IUserRepository _repository;
+            public AuthenticationUserAttribute(IUserRepository repository) => _repository = repository;
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             try { 
             var token = TokenOnRequest(context.HttpContext);
-            var repository = new RocketLeilaoDbContext();
             var email = FromBase64String(token);
 
-            var exists = repository.Users.Any(user => user.Email.Equals(email));
+            var exists = _repository.ExistUserwithEmail(email);
 
             } catch(Exception ex)
             {

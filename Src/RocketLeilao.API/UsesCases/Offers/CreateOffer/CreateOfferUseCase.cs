@@ -1,4 +1,5 @@
 ﻿using RocketLeilao.API.Comunications.Request.Response;
+using RocketLeilao.API.Contracts;
 using RocketLeilao.API.Entities;
 using RocketLeilao.API.Repositories;
 using RocketLeilao.API.Services;
@@ -7,9 +8,14 @@ namespace RocketLeilao.API.UsesCases.Offers.CreateOffer
 {
     public class CreateOfferUseCase
     {
-        private readonly LoggerUser _loggerUser;
+        private readonly ILoggedUser _loggerUser;
+        private readonly IOfferRepository _repository;
 
-        public CreateOfferUseCase(LoggerUser loggerUser) => _loggerUser = loggerUser;
+        public CreateOfferUseCase(ILoggedUser loggerUser, IOfferRepository repository)
+        {
+			_loggerUser = loggerUser;
+            _repository = repository;
+		}
 
         public int Execute(int itemId, RequestCreatedOfferJson request)
         {
@@ -22,10 +28,8 @@ namespace RocketLeilao.API.UsesCases.Offers.CreateOffer
                 UserId = user.Id
 
             };
-            var repository = new RocketLeilaoDbContext();
-            repository.Offers.Add(offer);
+            _repository.Add(offer);
 
-            repository.SaveChanges();
 
             return offer.Id;
         }
